@@ -1,0 +1,24 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Silk.NET -->
+    <PackageVersion Include="Silk.NET.Vulkan" Version="2.22.0" />
+    <PackageVersion Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.22.0" />
+    <PackageVersion Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.22.0" />
+    <PackageVersion Include="Silk.NET.Vulkan.Extensions.MVK" Version="2.22.0" />
+    <PackageVersion Include="Silk.NET.MoltenVK.Native" Version="2.22.0" />
+    <PackageVersion Include="Silk.NET.Windowing" Version="2.22.0" />
+    <PackageVersion Include="Silk.NET.Windowing.Common" Version="2.22.0" />
+    <PackageVersion Include="Silk.NET.Windowing.Sdl" Version="2.22.0" />
+    <PackageVersion Include="Silk.NET.Input" Version="2.22.0" />
+    <PackageVersion Include="Silk.NET.Input.Sdl" Version="2.22.0" />
+    <PackageVersion Include="Silk.NET.SDL" Version="2.22.0" />
+    <PackageVersion Include="Ultz.Native.SDL" Version="2.30.8" />
+    <!-- Other -->
+    <PackageVersion Include="Microsoft.Maui.Essentials" Version="10.0.11" />
+    <PackageVersion Include="SharpGLTF.Core" Version="1.0.5" />
+    <PackageVersion Include="SixLabors.ImageSharp" Version="3.1.12" />
+  </ItemGroup>
+</Project>

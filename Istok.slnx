@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/Examples/">
+    <Project Path="examples/AndroidExamplesRunner/AndroidExamplesRunner.csproj" />
+    <Project Path="examples/Examples/Examples.csproj" />
+    <Project Path="examples/ExamplesRunner/ExamplesRunner.csproj" />
+    <Project Path="examples/iOSAppExamplesRunner/iOSAppExamplesRunner.csproj" />
+  </Folder>
+  <Folder Name="/Istok/">
+    <Project Path="src/Istok.Core/Istok.Core.csproj" />
+    <Project Path="src/Istok.Mathematics/Istok.Mathematics.csproj" />
+    <Project Path="src/Istok.Rendering/Istok.Rendering.csproj" />
+    <Project Path="src/Istok/Istok.csproj" />
+    <Project Path="src/Silk.NET.Vulkan.Extensions/Silk.NET.Vulkan.Extensions.csproj" />
+  </Folder>
+</Solution>

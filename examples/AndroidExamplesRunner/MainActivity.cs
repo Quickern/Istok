@@ -9,7 +9,7 @@ using Android.Graphics;
 using Examples;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using Xamarin.Essentials;
+using Microsoft.Maui.Storage;
 
 
 namespace AndroidExamplesRunner;

@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0-android</TargetFramework>
+    <TargetFramework>net10.0-android</TargetFramework>
     <SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
     <OutputType>Exe</OutputType>
     <Nullable>enable</Nullable>
@@ -9,15 +9,17 @@
     <ApplicationVersion>1</ApplicationVersion>
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
   </PropertyGroup>
+  
   <ItemGroup>
-    <PackageReference Include="Silk.NET.Input.Sdl" Version="2.18.0"/>
-    <PackageReference Include="Silk.NET.SDL" Version="2.18.0"/>
-    <PackageReference Include="Silk.NET.Vulkan" Version="2.18.0"/>
-    <PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.18.0"/>
-    <PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.18.0"/>
-    <PackageReference Include="Silk.NET.Windowing.Sdl" Version="2.18.0"/>
-    <PackageReference Include="Ultz.Native.SDL" Version="2.30.1"/>
-    <PackageReference Include="Xamarin.Essentials" Version="1.8.1" />
+    <PackageReference Include="Silk.NET.Input.Sdl" />
+    <PackageReference Include="Silk.NET.SDL" />
+    <PackageReference Include="Silk.NET.Vulkan" />
+    <PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" />
+    <PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" />
+    <PackageReference Include="Silk.NET.Windowing.Sdl" />
+    <PackageReference Include="Ultz.Native.SDL" />
+    
+    <PackageReference Include="Microsoft.Maui.Essentials" />
   </ItemGroup>
 
   <ItemGroup>

@@ -89,7 +89,7 @@ public unsafe class Buffer : IDisposable
     {
         void* dataPointer;
         int dataLength = data.Length;
-        LogicalDevice.MapMemory(_memory, bufferOffsetInBytes, (ulong)dataLength, 0, &dataPointer);
+        LogicalDevice.MapMemory(_memory, bufferOffsetInBytes, (ulong)dataLength, MemoryMapFlags.None, &dataPointer);
         data.CopyTo(new Span<byte>(dataPointer, dataLength));
         LogicalDevice.UnmapMemory(_memory);
     }
