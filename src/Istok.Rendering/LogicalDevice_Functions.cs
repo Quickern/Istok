@@ -1729,12 +1729,12 @@ public partial class LogicalDevice
         return VK.InvalidateMappedMemoryRanges(_device, memoryRangeCount, in pMemoryRanges);
     }
 
-    public unsafe Result MapMemory(DeviceMemory memory, ulong offset, ulong size, uint flags, void** ppData)
+    public unsafe Result MapMemory(DeviceMemory memory, ulong offset, ulong size, MemoryMapFlags flags, void** ppData)
     {
         return VK.MapMemory(_device, memory, offset, size, flags, ppData);
     }
 
-    public unsafe Result MapMemory(DeviceMemory memory, ulong offset, ulong size, uint flags, ref void* ppData)
+    public unsafe Result MapMemory(DeviceMemory memory, ulong offset, ulong size, MemoryMapFlags flags, ref void* ppData)
     {
         return VK.MapMemory(_device, memory, offset, size, flags, ref ppData);
     }

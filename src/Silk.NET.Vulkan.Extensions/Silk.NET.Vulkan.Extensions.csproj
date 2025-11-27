@@ -1,15 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <RootNamespace>Silk.NET.Vulkan.Extensions</RootNamespace>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>Silk.NET.Vulkan.Extensions</RootNamespace>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Silk.NET.Vulkan" Version="2.18.0" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Silk.NET.Vulkan" />
+  </ItemGroup>
 
 </Project>
