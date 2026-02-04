@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.Helpers;
@@ -290,6 +291,39 @@ public unsafe class CommandList
         }
     }
 
+    public void Blit(Image srcImage, Vector4 srcOffset, Image dstImage, Vector4 dstOffset)
+    {
+        if (srcImage.Usage.HasFlag(ImageUsageFlags.DepthStencilAttachmentBit) || dstImage.Usage.HasFlag(ImageUsageFlags.DepthStencilAttachmentBit))
+        {
+            throw new NotImplementedException();
+            // throw new Exception(
+            //     $"Texture with {nameof(ImageUsageFlags)}.{nameof(ImageUsageFlags.DepthStencilAttachmentBit)} cannot cannot have Mipmaps");
+        }
+
+        ImageLayout srcLayout = srcImage.GetImageLayout(0, 0);
+        ImageLayout dstLayout = dstImage.GetImageLayout(0, 0);
+
+        srcImage.TransitionImageLayoutNonmatching(_commandBuffer, 0, 1, 0, srcImage.ArrayLayers, ImageLayout.TransferSrcOptimal);
+        dstImage.TransitionImageLayoutNonmatching(_commandBuffer, 0, 1, 0, dstImage.ArrayLayers, ImageLayout.TransferDstOptimal);
+
+        ImageBlit region = new ImageBlit
+        {
+            SrcSubresource = new ImageSubresourceLayers { AspectMask = ImageAspectFlags.ColorBit, BaseArrayLayer = 0, LayerCount = srcImage.ArrayLayers, MipLevel = 0 },
+            SrcOffsets = new ImageBlit.SrcOffsetsBuffer { Element0 = new Offset3D { X = (int)(srcOffset.X * srcImage.Width) + 1, Y = (int)(srcOffset.Y * srcImage.Height) + 1 }, Element1 = new Offset3D { X = (int)(srcOffset.Z * srcImage.Width) - 2, Y = (int)(srcOffset.W * srcImage.Height) - 2, Z = (int)srcImage.Depth } },
+            DstSubresource = new ImageSubresourceLayers { AspectMask = ImageAspectFlags.ColorBit, BaseArrayLayer = 0, LayerCount = dstImage.ArrayLayers, MipLevel = 0 },
+            DstOffsets = new ImageBlit.DstOffsetsBuffer { Element0 = new Offset3D { X = (int)(dstOffset.X * dstImage.Width) + 1, Y = (int)(dstOffset.Y * dstImage.Height) + 1 }, Element1 = new Offset3D { X = (int)(dstOffset.Z * dstImage.Width) - 2, Y = (int)(dstOffset.W * dstImage.Height) - 2, Z = (int)dstImage.Depth } },
+        };
+
+        _commandBuffer.CmdBlitImage(
+            srcImage.DeviceImage, ImageLayout.TransferSrcOptimal,
+            dstImage.DeviceImage, ImageLayout.TransferDstOptimal,
+            1, &region,
+            _logicalDevice.GetFormatFilter(srcImage.Format));
+
+        srcImage.TransitionImageLayoutNonmatching(_commandBuffer, 0, 1, 0, srcImage.ArrayLayers, srcLayout);
+        dstImage.TransitionImageLayoutNonmatching(_commandBuffer, 0, 1, 0, dstImage.ArrayLayers, dstLayout);
+    }
+
     /// <summary>
     /// Bind a pipeline object to a command buffer
     /// </summary>
@@ -476,6 +510,10 @@ public unsafe class CommandList
         _commandBuffer.CmdDispatchIndirect(indirectBuffer.DeviceBuffer, offset);
     }
 
+    public void TransitionImageLayout(Image image, ImageLayout layout)
+    {
+        image.TransitionImageLayout(_commandBuffer, 0, 1, 0, 1, layout);
+    }
 
     /// <summary>
     /// Resolve a multisample color image to a non-multisample color image

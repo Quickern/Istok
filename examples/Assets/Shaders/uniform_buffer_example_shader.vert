@@ -14,11 +14,11 @@ layout(location = 0) out vec3 fragColor;
 layout(location = 1) out vec2 fragTexCoord;
 
 void main() {
-    vec4 worldPosition = ubo.model * vec4(inPosition, 1);
-    vec4 viewPosition = ubo.view * worldPosition;
-    gl_Position = ubo.proj * viewPosition;
+//    vec4 worldPosition = ubo.model * vec4(inPosition, 1);
+//    vec4 viewPosition = ubo.view * worldPosition;
+//    gl_Position = ubo.proj * viewPosition;
 
-//    gl_Position = ubo.model * ubo.view * ubo.proj * vec4(inPosition, 1.0);
+    gl_Position =  ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);
     fragColor = inColor;
     fragTexCoord = inTexCoord;
 }

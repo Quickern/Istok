@@ -295,7 +295,7 @@ public unsafe class Image : IDisposable
 
     void TransitionIfSampled()
     {
-        if (Usage.HasFlag(ImageUsageFlags.SampledBit))
+        if (Usage.HasFlag(ImageUsageFlags.SampledBit) && !Usage.HasFlag(ImageUsageFlags.ColorAttachmentBit))
         {
             TransitionImageLayout(ImageLayout.ShaderReadOnlyOptimal);
         }

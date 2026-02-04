@@ -19,10 +19,10 @@ window.Initialize();
 // new Examples.TriangleExample(window, colorSrgb, File.ReadAllBytes).Run();
 // new Examples.QuadExample(window, colorSrgb, File.ReadAllBytes).Run();
 // new Examples.TexturedQuadExample(window, colorSrgb, File.ReadAllBytes).Run();
-// new Examples.UniformBufferExample(window, colorSrgb, File.ReadAllBytes).Run();
+new Examples.UniformBufferExample(window, colorSrgb, File.ReadAllBytes).Run();
 // new Examples.SimpleCameraAndRendererComponentsExample(window, colorSrgb, File.ReadAllBytes).Run();
 // new Examples.GltfExample(window, colorSrgb, File.ReadAllBytes).Run();
 // new Examples.GltfExampleAnimation(window, colorSrgb, File.ReadAllBytes).Run();
-new Examples.GltfSkinnedMeshExample(window, colorSrgb, File.ReadAllBytes).Run();
+// new Examples.GltfSkinnedMeshExample(window, colorSrgb, File.ReadAllBytes).Run();
 
 window.Dispose();
