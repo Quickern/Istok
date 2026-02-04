@@ -295,7 +295,7 @@ public unsafe class Image : IDisposable
 
     void TransitionIfSampled()
     {
-        if (Usage.HasFlag(ImageUsageFlags.SampledBit) && !Usage.HasFlag(ImageUsageFlags.ColorAttachmentBit))
+        if (Usage.HasFlag(ImageUsageFlags.SampledBit))
         {
             TransitionImageLayout(ImageLayout.ShaderReadOnlyOptimal);
         }
@@ -571,6 +571,14 @@ public unsafe class Image : IDisposable
         ImageLayout newLayout)
     {
         Debug.Assert(oldLayout != newLayout);
+
+        ImageLayout original = oldLayout;
+        if (oldLayout != ImageLayout.ShaderReadOnlyOptimal)
+        {
+            if (newLayout == ImageLayout.ColorAttachmentOptimal || oldLayout == ImageLayout.ColorAttachmentOptimal)
+                oldLayout = ImageLayout.Undefined;
+        }
+
         ImageMemoryBarrier barrier = new ImageMemoryBarrier
         {
             SType = StructureType.ImageMemoryBarrier,
@@ -728,6 +736,24 @@ public unsafe class Image : IDisposable
                 barrier.DstAccessMask = AccessFlags.TransferReadBit;
                 srcStageFlags = PipelineStageFlags.BottomOfPipeBit;
                 dstStageFlags = PipelineStageFlags.TransferBit;
+                break;
+            case (ImageLayout.Undefined, ImageLayout.ColorAttachmentOptimal):
+                barrier.SrcAccessMask = original == ImageLayout.ShaderReadOnlyOptimal ? AccessFlags.ShaderReadBit : AccessFlags.None;
+                barrier.DstAccessMask = AccessFlags.ColorAttachmentWriteBit;
+                srcStageFlags = original == ImageLayout.PresentSrcKhr ? PipelineStageFlags.TopOfPipeBit : PipelineStageFlags.FragmentShaderBit;
+                dstStageFlags = PipelineStageFlags.ColorAttachmentOutputBit;
+                break;
+            case (ImageLayout.Undefined, ImageLayout.ShaderReadOnlyOptimal):
+                barrier.SrcAccessMask = AccessFlags.ColorAttachmentWriteBit;
+                barrier.DstAccessMask = AccessFlags.ShaderReadBit;
+                srcStageFlags = PipelineStageFlags.ColorAttachmentOutputBit;
+                dstStageFlags = PipelineStageFlags.FragmentShaderBit;
+                break;
+            case (ImageLayout.ShaderReadOnlyOptimal, ImageLayout.ColorAttachmentOptimal):
+                barrier.SrcAccessMask = AccessFlags.ShaderReadBit;
+                barrier.DstAccessMask = AccessFlags.MemoryReadBit;
+                srcStageFlags = PipelineStageFlags.FragmentShaderBit;
+                dstStageFlags = PipelineStageFlags.ColorAttachmentOutputBit;
                 break;
             default:
                 Debug.Fail("Invalid image layout transition.");

@@ -104,17 +104,27 @@ public sealed unsafe class Framebuffer : IDisposable
         }
     }
 
-    public void TransitionToIntermediateLayout()
+    public void TransitionToIntermediateLayout(CommandBuffer commandBuffer)
     {
         foreach (ImageView imageView in ColorTargets)
         {
-            imageView.Target.SetImageLayout(imageView.BaseMipLevel, imageView.BaseArrayLayer, ImageLayout.ColorAttachmentOptimal);
+            Image image = imageView.Target;
+            image.TransitionImageLayout(
+                commandBuffer,
+                imageView.BaseMipLevel, 1,
+                imageView.BaseArrayLayer, 1,
+                ImageLayout.ColorAttachmentOptimal);
         }
 
-        DepthTarget?.Target.SetImageLayout(
-            DepthTarget.BaseMipLevel,
-            DepthTarget.BaseArrayLayer,
-            ImageLayout.DepthStencilAttachmentOptimal);
+        if (DepthTarget != null)
+        {
+            Image image = DepthTarget.Target;
+            image.TransitionImageLayout(
+                commandBuffer,
+                DepthTarget.BaseMipLevel, 1,
+                DepthTarget.BaseArrayLayer, 1,
+                ImageLayout.DepthStencilAttachmentOptimal);
+        }
     }
 
     public void TransitionToFinalLayout(CommandBuffer commandBuffer)

@@ -583,7 +583,7 @@ public unsafe class CommandList
     {
         Debug.Assert(_activeRenderPass != null);
         _commandBuffer.CmdEndRenderPass();
-        _framebuffer.TransitionToIntermediateLayout();
+        _framebuffer.TransitionToIntermediateLayout(_commandBuffer);
         _activeRenderPass = null;
 
         _commandBuffer.CmdPipelineBarrier(
