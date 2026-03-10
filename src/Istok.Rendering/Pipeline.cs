@@ -46,14 +46,17 @@ public unsafe class Pipeline : IDisposable
         PipelineRasterizationStateCreateInfo rasterizerStateCI = description.RasterizerState;
 
 
-        DynamicState* dynamicStates = stackalloc DynamicState[2];
+        DynamicState* dynamicStates = stackalloc DynamicState[5];
         dynamicStates[0] = DynamicState.Viewport;
         dynamicStates[1] = DynamicState.Scissor;
+        dynamicStates[2] = DynamicState.StencilReference;
+        dynamicStates[3] = DynamicState.StencilCompareMask;
+        dynamicStates[4] = DynamicState.StencilWriteMask;
 
         PipelineDynamicStateCreateInfo dynamicStateCI = new PipelineDynamicStateCreateInfo
         {
             SType = StructureType.PipelineDynamicStateCreateInfo,
-            DynamicStateCount = 2,
+            DynamicStateCount = 5,
             PDynamicStates = dynamicStates,
         };
 

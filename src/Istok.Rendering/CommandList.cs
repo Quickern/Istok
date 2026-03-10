@@ -50,6 +50,8 @@ public unsafe class CommandList
 
     public bool IsDisposed { get; private set; }
 
+    public CommandBuffer CommandBuffer => _commandBuffer;
+
     public  string Name
     {
         get => _name;
