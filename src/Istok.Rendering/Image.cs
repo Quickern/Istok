@@ -560,6 +560,55 @@ public unsafe class Image : IDisposable
         };
     }
 
+    public void ReadBack(
+        Span<byte> destination,
+        uint x, uint y,
+        uint width, uint height)
+    {
+        uint totalSize = Format.GetRegionSize(width, height, 1);
+        if (destination.Length < totalSize)
+            throw new ArgumentException($"Destination span too small: {destination.Length} < {totalSize}");
+
+        Buffer stagingBuffer = _stagingBuffersPool.Get(totalSize);
+
+        CommandPool commandPool = _commandPoolStorage.Value;
+        CommandBuffer cb = commandPool.AllocateCommandBuffer();
+        cb.Begin();
+
+        TransitionImageLayout(cb, 0, 1, 0, 1, ImageAspectFlags.ColorBit, _imageLayouts[0], ImageLayout.TransferSrcOptimal);
+
+        ImageSubresourceLayers subresource = new ImageSubresourceLayers
+        {
+            AspectMask = ImageAspectFlags.ColorBit,
+            LayerCount = 1,
+            MipLevel = 0,
+            BaseArrayLayer = 0
+        };
+
+        BufferImageCopy region = new BufferImageCopy
+        {
+            BufferOffset = 0,
+            BufferRowLength = width,
+            BufferImageHeight = height,
+            ImageSubresource = subresource,
+            ImageOffset = new Offset3D { X = (int)x, Y = (int)y, Z = 0 },
+            ImageExtent = new Extent3D { Width = width, Height = height, Depth = 1 }
+        };
+
+        cb.CmdCopyImageToBuffer(_image, ImageLayout.TransferSrcOptimal, stagingBuffer.DeviceBuffer, 1, in region);
+
+        TransitionImageLayout(cb, 0, 1, 0, 1, ImageAspectFlags.ColorBit, ImageLayout.TransferSrcOptimal, ImageLayout.ShaderReadOnlyOptimal);
+
+        cb.End();
+        Fence fence = cb.SubmitCommandBuffer(0, null, 0, null);
+        fence.Wait();
+
+        stagingBuffer.Read(0, destination);
+
+        commandPool.Return(cb);
+        _stagingBuffersPool.Return(stagingBuffer);
+    }
+
     public void TransitionImageLayout(
         CommandBuffer cb,
         uint baseMipLevel,

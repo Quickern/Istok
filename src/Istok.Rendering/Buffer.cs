@@ -94,6 +94,20 @@ public unsafe class Buffer : IDisposable
         LogicalDevice.UnmapMemory(_memory);
     }
 
+    public void Read(uint bufferOffsetInBytes, Span<byte> destination)
+    {
+        if (!IsDynamic)
+            throw new InvalidOperationException("Cannot read from a non-host-visible buffer");
+
+        if (bufferOffsetInBytes + destination.Length > SizeInBytes)
+            throw new ArgumentOutOfRangeException($"Failed to read {destination.Length} bytes with {bufferOffsetInBytes} bytes offset from buffer {SizeInBytes} bytes size");
+
+        void* dataPointer;
+        LogicalDevice.MapMemory(_memory, bufferOffsetInBytes, (ulong)destination.Length, MemoryMapFlags.None, &dataPointer);
+        new ReadOnlySpan<byte>(dataPointer, destination.Length).CopyTo(destination);
+        LogicalDevice.UnmapMemory(_memory);
+    }
+
     public void Dispose()
     {
         if (!_destroyed)
