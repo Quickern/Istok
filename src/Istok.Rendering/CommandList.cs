@@ -387,7 +387,10 @@ public unsafe class CommandList
 
         if (_activeRenderPass != null)
         {
-            ImageAspectFlags aspect = _framebuffer.DepthTarget!.Target.Format.HasStencil()
+            if (_framebuffer.DepthTarget == null)
+                return;
+
+            ImageAspectFlags aspect = _framebuffer.DepthTarget.Target.Format.HasStencil()
                 ? ImageAspectFlags.DepthBit | ImageAspectFlags.StencilBit
                 : ImageAspectFlags.DepthBit;
             ClearAttachment clearAttachment = new ClearAttachment { AspectMask = aspect, ClearValue = clearValue };
