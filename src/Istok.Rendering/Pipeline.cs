@@ -96,9 +96,10 @@ public unsafe class Pipeline : IDisposable
             for (int location = 0; location < inputDesc.Elements.Length; location++)
             {
                 VertexElementDescription inputElement = inputDesc.Elements[location];
+                uint offset = inputElement.Offset ?? currentOffset;
                 attributeDescriptions[targetIndex] = new VertexInputAttributeDescription
                 {
-                    Format = inputElement.Format, Binding = (uint)binding, Location = (uint)(targetLocation + location), Offset = currentOffset,
+                    Format = inputElement.Format, Binding = (uint)binding, Location = (uint)(targetLocation + location), Offset = offset,
                 };
                 targetIndex += 1;
                 currentOffset += inputElement.Format.ElementSize();
