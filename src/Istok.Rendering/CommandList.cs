@@ -311,9 +311,9 @@ public unsafe class CommandList
         ImageBlit region = new ImageBlit
         {
             SrcSubresource = new ImageSubresourceLayers { AspectMask = ImageAspectFlags.ColorBit, BaseArrayLayer = 0, LayerCount = srcImage.ArrayLayers, MipLevel = 0 },
-            SrcOffsets = new ImageBlit.SrcOffsetsBuffer { Element0 = new Offset3D { X = (int)(srcOffset.X * srcImage.Width) + 1, Y = (int)(srcOffset.Y * srcImage.Height) + 1 }, Element1 = new Offset3D { X = (int)(srcOffset.Z * srcImage.Width) - 2, Y = (int)(srcOffset.W * srcImage.Height) - 2, Z = (int)srcImage.Depth } },
+            SrcOffsets = new ImageBlit.SrcOffsetsBuffer { Element0 = new Offset3D { X = (int)(srcOffset.X * srcImage.Width), Y = (int)(srcOffset.Y * srcImage.Height) }, Element1 = new Offset3D { X = (int)(srcOffset.Z * srcImage.Width), Y = (int)(srcOffset.W * srcImage.Height), Z = (int)srcImage.Depth } },
             DstSubresource = new ImageSubresourceLayers { AspectMask = ImageAspectFlags.ColorBit, BaseArrayLayer = 0, LayerCount = dstImage.ArrayLayers, MipLevel = 0 },
-            DstOffsets = new ImageBlit.DstOffsetsBuffer { Element0 = new Offset3D { X = (int)(dstOffset.X * dstImage.Width) + 1, Y = (int)(dstOffset.Y * dstImage.Height) + 1 }, Element1 = new Offset3D { X = (int)(dstOffset.Z * dstImage.Width) - 2, Y = (int)(dstOffset.W * dstImage.Height) - 2, Z = (int)dstImage.Depth } },
+            DstOffsets = new ImageBlit.DstOffsetsBuffer { Element0 = new Offset3D { X = (int)(dstOffset.X * dstImage.Width), Y = (int)(dstOffset.Y * dstImage.Height) }, Element1 = new Offset3D { X = (int)(dstOffset.Z * dstImage.Width), Y = (int)(dstOffset.W * dstImage.Height), Z = (int)dstImage.Depth } },
         };
 
         _commandBuffer.CmdBlitImage(
