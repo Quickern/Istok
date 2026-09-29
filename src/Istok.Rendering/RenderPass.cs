@@ -64,12 +64,35 @@ public unsafe class RenderPass : IDisposable
             PDepthStencilAttachment = depthTarget != null ? &depthAttachmentRef : default,
         };
 
-        SubpassDependency subpassDependency = new SubpassDependency
+        // A framebuffer is rendered to across several command buffers per frame (one per pipeline pass), so
+        // attachments loaded with AttachmentLoadOp.Load must see the previous pass's colour and depth writes:
+        // both external dependencies name the fragment-test stages and the depth/stencil accesses, and the
+        // incoming one carries a source access mask (without it, prior writes are never made available).
+        const PipelineStageFlags attachmentStages =
+            PipelineStageFlags.ColorAttachmentOutputBit | PipelineStageFlags.EarlyFragmentTestsBit | PipelineStageFlags.LateFragmentTestsBit;
+        const AccessFlags attachmentWrites = AccessFlags.ColorAttachmentWriteBit | AccessFlags.DepthStencilAttachmentWriteBit;
+        const AccessFlags attachmentAccess =
+            AccessFlags.ColorAttachmentReadBit | AccessFlags.ColorAttachmentWriteBit
+            | AccessFlags.DepthStencilAttachmentReadBit | AccessFlags.DepthStencilAttachmentWriteBit;
+
+        SubpassDependency* subpassDependencies = stackalloc SubpassDependency[2];
+        subpassDependencies[0] = new SubpassDependency
         {
             SrcSubpass = Vk.SubpassExternal,
-            SrcStageMask = PipelineStageFlags.ColorAttachmentOutputBit,
-            DstStageMask = PipelineStageFlags.ColorAttachmentOutputBit,
-            DstAccessMask = AccessFlags.ColorAttachmentReadBit | AccessFlags.ColorAttachmentWriteBit,
+            DstSubpass = 0,
+            SrcStageMask = attachmentStages,
+            SrcAccessMask = attachmentWrites,
+            DstStageMask = attachmentStages,
+            DstAccessMask = attachmentAccess,
+        };
+        subpassDependencies[1] = new SubpassDependency
+        {
+            SrcSubpass = 0,
+            DstSubpass = Vk.SubpassExternal,
+            SrcStageMask = attachmentStages,
+            SrcAccessMask = attachmentWrites,
+            DstStageMask = attachmentStages | PipelineStageFlags.FragmentShaderBit,
+            DstAccessMask = attachmentAccess | AccessFlags.ShaderReadBit,
         };
 
         RenderPassCreateInfo renderPassCI = new RenderPassCreateInfo
@@ -79,8 +102,8 @@ public unsafe class RenderPass : IDisposable
             PAttachments = attachments,
             SubpassCount = 1,
             PSubpasses = &subpass,
-            DependencyCount = 1,
-            PDependencies = &subpassDependency,
+            DependencyCount = 2,
+            PDependencies = subpassDependencies,
         };
 
         Result creationResult = logicalDevice.CreateRenderPass(in renderPassCI, null, out Silk.NET.Vulkan.RenderPass renderPass);
