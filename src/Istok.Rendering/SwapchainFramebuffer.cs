@@ -46,6 +46,8 @@ public class SwapchainFramebuffer : IDisposable
 
     public Framebuffer CurrentFramebuffer => _scFramebuffers[(int)_currentImageIndex];
 
+    internal Image CurrentColorImage => _scColorTextures[(int)_currentImageIndex][0];
+
     public uint Width { get; private set; }
 
     public uint Height { get; private set; }

@@ -193,6 +193,7 @@ public unsafe partial class Graphics : IDisposable
             SType = StructureType.PresentInfoKhr, SwapchainCount = 1, PSwapchains = &deviceSwapchain, PImageIndices = &imageIndex,
         };
 
+        swapchain.PrepareForPresent();
         swapchain.PresentQueue.Present(in presentInfo);
         if (swapchain.AcquireNextImage(new Semaphore(), swapchain.ImageAvailableFence))
         {

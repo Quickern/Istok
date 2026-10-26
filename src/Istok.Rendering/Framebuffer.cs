@@ -104,27 +104,38 @@ public sealed unsafe class Framebuffer : IDisposable
         }
     }
 
-    public void TransitionToIntermediateLayout(CommandBuffer commandBuffer)
+    public void TransitionToInitialLayout(CommandBuffer commandBuffer)
     {
-        foreach (ImageView imageView in ColorTargets)
+        for (int i = 0; i < ColorTargets.Count; i++)
         {
-            Image image = imageView.Target;
-            image.TransitionImageLayout(
+            ImageView imageView = ColorTargets[i];
+            imageView.Target.TransitionImageLayout(
                 commandBuffer,
                 imageView.BaseMipLevel, 1,
                 imageView.BaseArrayLayer, 1,
-                ImageLayout.ColorAttachmentOptimal);
+                RenderPass.ColorTargets[i].InitialLayout);
         }
 
         if (DepthTarget != null)
         {
-            Image image = DepthTarget.Target;
-            image.TransitionImageLayout(
+            DepthTarget.Target.TransitionImageLayout(
                 commandBuffer,
                 DepthTarget.BaseMipLevel, 1,
                 DepthTarget.BaseArrayLayer, 1,
-                ImageLayout.DepthStencilAttachmentOptimal);
+                RenderPass.DepthTarget!.Value.InitialLayout);
         }
+    }
+
+    public void MarkFinalLayout()
+    {
+        for (int i = 0; i < ColorTargets.Count; i++)
+        {
+            ImageView imageView = ColorTargets[i];
+            imageView.Target.SetImageLayout(imageView.BaseMipLevel, imageView.BaseArrayLayer, RenderPass.ColorTargets[i].FinalLayout);
+        }
+
+        if (DepthTarget != null)
+            DepthTarget.Target.SetImageLayout(DepthTarget.BaseMipLevel, DepthTarget.BaseArrayLayer, RenderPass.DepthTarget!.Value.FinalLayout);
     }
 
     public void TransitionToFinalLayout(CommandBuffer commandBuffer)

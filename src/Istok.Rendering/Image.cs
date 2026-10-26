@@ -219,12 +219,7 @@ public unsafe class Image : IDisposable
         };
         ImageLayout[] imageLayouts = [ImageLayout.Undefined];
 
-        Image image = new Image(existingImage, logicalDevice, stagingBuffersPool, commandPoolsStorage, ref description, imageLayouts, true, default);
-
-        image.TransitionImageLayout(ImageLayout.PresentSrcKhr);
-        //TODO: ClearIfRenderTarget cause freezes when recreate swapchain, replaced with TransitionImageLayout for now
-        // image.ClearIfRenderTarget();
-        return image;
+        return new Image(existingImage, logicalDevice, stagingBuffersPool, commandPoolsStorage, ref description, imageLayouts, true, default);
     }
 
     void ClearIfRenderTarget()
@@ -301,7 +296,7 @@ public unsafe class Image : IDisposable
         }
     }
 
-    void TransitionImageLayout(ImageLayout layout)
+    internal void TransitionImageLayout(ImageLayout layout)
     {
         CommandPool commandPool = _commandPoolStorage.Value;
         CommandBuffer cb = commandPool.AllocateCommandBuffer();
@@ -621,13 +616,6 @@ public unsafe class Image : IDisposable
     {
         Debug.Assert(oldLayout != newLayout);
 
-        ImageLayout original = oldLayout;
-        if (oldLayout != ImageLayout.ShaderReadOnlyOptimal)
-        {
-            if (newLayout == ImageLayout.ColorAttachmentOptimal || oldLayout == ImageLayout.ColorAttachmentOptimal)
-                oldLayout = ImageLayout.Undefined;
-        }
-
         ImageMemoryBarrier barrier = new ImageMemoryBarrier
         {
             SType = StructureType.ImageMemoryBarrier,
@@ -652,12 +640,17 @@ public unsafe class Image : IDisposable
         switch (oldLayout, newLayout)
         {
             case (ImageLayout.Undefined, ImageLayout.TransferDstOptimal):
-            case (ImageLayout.Undefined, ImageLayout.PresentSrcKhr):
             case (ImageLayout.Preinitialized, ImageLayout.TransferDstOptimal):
                 barrier.SrcAccessMask = AccessFlags.None;
                 barrier.DstAccessMask = AccessFlags.TransferWriteBit;
                 srcStageFlags = PipelineStageFlags.TopOfPipeBit;
                 dstStageFlags = PipelineStageFlags.TransferBit;
+                break;
+            case (ImageLayout.Undefined, ImageLayout.PresentSrcKhr):
+                barrier.SrcAccessMask = AccessFlags.None;
+                barrier.DstAccessMask = AccessFlags.ColorAttachmentReadBit | AccessFlags.ColorAttachmentWriteBit;
+                srcStageFlags = PipelineStageFlags.TopOfPipeBit;
+                dstStageFlags = PipelineStageFlags.ColorAttachmentOutputBit;
                 break;
             case (ImageLayout.ShaderReadOnlyOptimal, ImageLayout.TransferSrcOptimal):
                 barrier.SrcAccessMask = AccessFlags.ShaderReadBit;
@@ -787,9 +780,9 @@ public unsafe class Image : IDisposable
                 dstStageFlags = PipelineStageFlags.TransferBit;
                 break;
             case (ImageLayout.Undefined, ImageLayout.ColorAttachmentOptimal):
-                barrier.SrcAccessMask = original == ImageLayout.ShaderReadOnlyOptimal ? AccessFlags.ShaderReadBit : AccessFlags.None;
+                barrier.SrcAccessMask = AccessFlags.None;
                 barrier.DstAccessMask = AccessFlags.ColorAttachmentWriteBit;
-                srcStageFlags = original == ImageLayout.PresentSrcKhr ? PipelineStageFlags.TopOfPipeBit : PipelineStageFlags.FragmentShaderBit;
+                srcStageFlags = PipelineStageFlags.TopOfPipeBit;
                 dstStageFlags = PipelineStageFlags.ColorAttachmentOutputBit;
                 break;
             case (ImageLayout.Undefined, ImageLayout.ShaderReadOnlyOptimal):

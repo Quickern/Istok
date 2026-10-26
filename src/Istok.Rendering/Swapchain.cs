@@ -126,6 +126,13 @@ public unsafe class Swapchain : IDisposable
         return true;
     }
 
+    public void PrepareForPresent()
+    {
+        Image image = _framebuffer.CurrentColorImage;
+        if (image.GetImageLayout(0, 0) != ImageLayout.PresentSrcKhr)
+            image.TransitionImageLayout(ImageLayout.PresentSrcKhr);
+    }
+
     public void RecreateAndReacquire()
     {
         if (CreateSwapchain())

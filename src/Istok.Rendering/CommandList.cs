@@ -566,6 +566,8 @@ public unsafe class CommandList
             _clearValues[_framebuffer.ColorTargets.Count] = _depthClearValue;
         }
 
+        _framebuffer.TransitionToInitialLayout(_commandBuffer);
+
         fixed (ClearValue* clearValuesPtr = &_clearValues[0])
         {
             RenderPassBeginInfo renderPassBeginInfo = new RenderPassBeginInfo
@@ -588,7 +590,7 @@ public unsafe class CommandList
     {
         Debug.Assert(_activeRenderPass != null);
         _commandBuffer.CmdEndRenderPass();
-        _framebuffer.TransitionToIntermediateLayout(_commandBuffer);
+        _framebuffer.MarkFinalLayout();
         _activeRenderPass = null;
 
         _commandBuffer.CmdPipelineBarrier(
