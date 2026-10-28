@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using Silk.NET.Core.Native;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.KHR;
+using Silk.NET.Vulkan.Extensions.Missed;
 
 namespace Istok.Rendering;
 
@@ -52,6 +53,12 @@ public unsafe partial class LogicalDevice : IDisposable
             PpEnabledExtensionNames = (byte**)activeExtensionsPtr,
         };
 
+        // A portability (MoltenVK) device keeps image view swizzles off unless asked for them
+        PhysicalDevicePortabilitySubsetFeaturesKHR portabilityFeatures = GetPortabilityFeatures(physicalDevice, activeExtensions);
+
+        if (portabilityFeatures.ImageViewFormatSwizzle)
+            deviceCreateInfo.PNext = &portabilityFeatures;
+
         Result result = physicalDevice.CreateDevice(in deviceCreateInfo, null, out Device device);
 
         Helpers.CheckErrors(result);
@@ -66,6 +73,34 @@ public unsafe partial class LogicalDevice : IDisposable
         }
 
         return logicalDevice;
+    }
+
+    static PhysicalDevicePortabilitySubsetFeaturesKHR GetPortabilityFeatures(PhysicalDevice physicalDevice, List<string> activeExtensions)
+    {
+        PhysicalDevicePortabilitySubsetFeaturesKHR enabled = new PhysicalDevicePortabilitySubsetFeaturesKHR
+        {
+            SType = StructureType.PhysicalDevicePortabilitySubsetFeaturesKhr,
+        };
+
+        if (!activeExtensions.Contains(KhrPortabilitySubset.ExtensionName))
+            return enabled;
+
+        PhysicalDevicePortabilitySubsetFeaturesKHR supported = new PhysicalDevicePortabilitySubsetFeaturesKHR
+        {
+            SType = StructureType.PhysicalDevicePortabilitySubsetFeaturesKhr,
+        };
+
+        PhysicalDeviceFeatures2 features = new PhysicalDeviceFeatures2
+        {
+            SType = StructureType.PhysicalDeviceFeatures2,
+            PNext = &supported,
+        };
+
+        physicalDevice.GetPhysicalDeviceFeatures2(&features);
+
+        enabled.ImageViewFormatSwizzle = supported.ImageViewFormatSwizzle;
+
+        return enabled;
     }
 
     public void GetSwapchainImages(SwapchainKHR deviceSwapchain, ref Silk.NET.Vulkan.Image[] images)
